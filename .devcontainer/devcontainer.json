@@ -1,0 +1,11 @@
+{
+	"image": "debian:trixie",
+	"features": {},
+	"postCreateCommand": "uname -a",
+	"customizations": {
+		"vscode": {
+			"extensions": []
+		}
+	},
+    "remoteUser": "root"
+}
