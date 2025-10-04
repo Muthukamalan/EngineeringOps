@@ -1,0 +1,15 @@
+stages:
+  pull: 
+    cmd: dvc pull
+  hparams: #train simple model
+    cmd: make hparams
+  train:
+    cmd: make  train
+  test:
+    cmd: make test
+  eval:
+    cmd: make eval
+  inference:
+    cmd: make inference
+  deploy:
+    cmd: make deploy
