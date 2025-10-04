@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  containers:
+   - name: mysql
+     image: mysql:5
+    #  resources:
+    #   limits:
+    #     memory: "128Mi"
+    #     cpu: "1000m"
+     env:
+      # Use secret in real life
+      - name: MYSQL_ROOT_PASSWORD
+        value: password
+      - name: MYSQL_DATABASE
+        value: fleetman
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: database
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+  type: ClusterIP
+
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  # minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: webapp
+  replicas: 2
+  template: # template for the pods
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: richardchesterwood/k8s-fleetman-webapp-angular:release0-5
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: queue
+  labels:
+    app: queue
+spec:
+  containers:
+  - name: queue
+    image: richardchesterwood/k8s-fleetman-queue:release1
+    # resources:
+    #   limits:
+    #     memory: "128Mi"
+    #     cpu: "500m"
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetman-webapp
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: webapp
+
+  ports:
+    - name: http
+      port: 80
+      nodePort: 30080
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetman-queue
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: queue
+  ports:
+    - name: http
+      port: 8161
+      nodePort: 30010
+  type: NodePort
