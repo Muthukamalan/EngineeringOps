@@ -30,21 +30,21 @@ spec:
         memory: "128Mi"
         cpu: "500m"
 
---- 
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: fleetman-webapp-svc-1
+  name: fleetman-webapp-svc  # Unique key of the Service
 spec:
   # This defines which pods are going to be represented by this Service
   # The service becomes a network endpoint for either other services
   # or maybe external users to connect to (eg browser)
   selector:
-    app: webapp
-    release: "0"
+    app: webapp                # In the Pod, check Label
+    release: "0"               # and check the release 
 
   ports:
-    - name: http
+    - name: http  # accept the traffic sent to port 80
       port: 80
       nodePort: 30080  # best practise
 
