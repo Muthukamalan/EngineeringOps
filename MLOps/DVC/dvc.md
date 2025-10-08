@@ -7,10 +7,11 @@ dvc init  ( we use dvc+supporting SCM tool always here)
 dvc add path/data_folder/
 
 
-dvc config core.analytics false
 
-<!-- autotage -->
-dvc config core.autostage true
+```sh
+dvc config core.analytics false
+dvc config core.autostage true  # autotage
+```
 
 <!-- space check -->
 dvc du path/data_folder/
@@ -38,11 +39,13 @@ dvc remote modify gdrive gdrive_clien_secret  CLIENT-SECRET
 <!-- push to dgrive and manage -->
 dvc push -r gdrive
 
-<!-- whenever data change and commit dvc md5 hash changes, do  git commit `best practise` -->
-<!-- git push won't allow because of the secrets, click the link and allow it -->
-[reference 1](https://medium.com/@ajithkumarv/setting-up-a-workflow-with-dvc-google-drive-and-github-actions-f3775de4bf63)
-[reference 2](https://medium.com/@ajithkumarv/setting-up-a-workflow-with-dvc-google-cloud-storage-gcs-bucket-and-github-actions-95cfa71e4386)
 
+ whenever data change and commit dvc md5 hash changes, do  git commit `best practise` 
+
+```sh
+dvc commit
+git commit
+```
 
 <-- pull it from dvc -->
 dvc pull -r local
@@ -74,3 +77,51 @@ edit:: `data.dvc`
 
 <!-- reproduce -->
 dvc repro
+
+
+
+
+**[pull from container](https://stackoverflow.com/questions/76306644/how-can-i-reauthorize-dvc-with-google-drive-for-remote-storage)**
+**err: [configuration](https://discuss.dvc.org/t/error-configuration-error-gdrive-remote-auth-failed-with-credentials-in-gdrive-credentials-data/1254)**
+
+
+----
+
+
+
+# [[S3]] + [[dvc]]
+```sh
+pip install dvc[s3]
+```
+
+> [!IMPORTANT] create IAM user
+> - AdministratorAccess
+> - AmazonS3FullAccess
+
+
+`note:` setup [[AWS CLI]] in the machine
+```sh
+aws configure
+> AWS ACCESS_KEY_ID
+> AWS SECRET_ACCESS_KEY
+> DEFAULT REGION NAME: ap-south-1
+> DEFAULT OUTPUT_FORMAT: json
+```
+
+```sh
+aws s3 ls
+```
+
+```sh
+git init 
+dvc init
+git add README.md
+git commit -m "init commit"
+git branch -M main
+
+# DVC
+dvc add path_to_dataset/
+dvc remote add -d myremote s3://bucket-name 
+dvc push
+dvc pull
+```
